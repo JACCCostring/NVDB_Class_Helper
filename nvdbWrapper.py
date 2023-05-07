@@ -78,7 +78,7 @@ class EspecificObjectTasks:
 
 
     @classmethod
-    def findRelation(self, source, component='Ventilasjonsanlegg', parentObjectName = 'name'):
+    def findRelation(self, source, component='Ventilasjonsanlegg', parentObjectName = 'foreldrenavn', objectType = 0):
         data = ""
         parsed = {}
         vegObj = ""
@@ -103,7 +103,7 @@ class EspecificObjectTasks:
                                         dictionary = {
                                             'vegobjekt': vegObj,
                                             'relasjon': v,
-                                            'objekttype': '',
+                                            'objekttype': objectType,
                                             'navn': parentObjectName,
                                             'vegreferanse': self.findVegReferanse(self.objectType, int(vegObj))
                                         }

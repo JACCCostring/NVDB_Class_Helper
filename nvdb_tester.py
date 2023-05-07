@@ -17,14 +17,13 @@ def main():
         for object in raw:
             name = EspecificObjectTasks.getMeta(object)['navn']
             id = EspecificObjectTasks.getMeta(object)['id']
-            # print(id, name)
+
             relation = object['relasjoner']
             barn = relation['barn']
 
             for object in barn:
                 for vegObj in object['vegobjekter']:
-                    # name = EspecificObjectTasks.getMeta(581, int(vegObj))
-                    data = EspecificObjectTasks.findRelation(EspecificObjectTasks.constructEndPoint(67, int(vegObj)))
+                    data = EspecificObjectTasks.findRelation(EspecificObjectTasks.constructEndPoint(67, int(vegObj)), parentObjectName=name, objectType=id)
                     print(data)
 
         more = raw.nesteForekomst()
