@@ -4,29 +4,6 @@ from nvdbapiv3 import nvdbFagdata
 # from nvdbapiv3 import nvdbVegnett
 # from nvdbapiv3 import finnid
 
-class NVDBWrapperClass:
-    def __init__(self):
-        pass
-
-    @classmethod
-    def rawData(self, id):
-        raw = nvdbFagdata(id)
-
-        data = raw.to_records()
-
-        return data
-    
-    @classmethod
-    def rawObject(self, id):
-        obj = nvdbFagdata(id)
-
-        return obj
-
-
-import json
-import requests
-
-# class to allow cleaner and readable code
 class EspecificObjectTasks:
     def __init__(self):
         pass
@@ -35,7 +12,8 @@ class EspecificObjectTasks:
     def constructEndPoint(self, datakatalogId, nvdbId):
         endpoint = f'https://nvdbapiles-v3.atlas.vegvesen.no/vegobjekter/{datakatalogId}/{nvdbId}' + '.json'
         self.objectType = datakatalogId
-
+        self.nvdbId = nvdbId
+        
         response = requests.get(endpoint)
 
         if response.status_code == 200:
@@ -68,15 +46,32 @@ class EspecificObjectTasks:
 
     @classmethod
     def getMeta(self, raw):
-        # parsed = json.loads(str(raw))
+        nvdbId = raw['id']
         
         for field, value in raw['metadata'].items():
             if field == 'type':
                 return {
                     'id': value['id'],
-                    'navn': value['navn']}
-
-
+                    'navn': value['navn'],
+                    'nvdbId': nvdbId}
+                    
+    
+    @classmethod
+    def findEspecificChildRelation(self, raw, child=True, name='Tunnelløp'):
+        if child:
+            for key, value in raw['relasjoner'].items():
+                if key == 'barn':
+                    for val in value:
+                        type = val['type']
+                        childName = type['navn']
+                        
+                        if childName == name:
+                            return {
+                                    'navn': type['navn'],
+                                    'id': type['id'],
+                                    'vegobjekter': val['vegobjekter']
+                                        }
+            
     @classmethod
     def findRelation(self, source, component='Ventilasjonsanlegg', parentObjectName = 'foreldrenavn', objectType = 0):
         data = ""
@@ -99,10 +94,10 @@ class EspecificObjectTasks:
                         if key == 'type':
                             for k, v in value.items():
                                 if k == 'navn':
-                                    if v == component:
+                                    if v == component or 'Vifte/Ventilator':
                                         dictionary = {
-                                            'vegobjekt': vegObj,
-                                            'relasjon': v,
+                                            'vegobjekt': self.nvdbId,
+                                            'relasjon': 'Vifte/Ventilator - Ventilasjon',
                                             'objekttype': objectType,
                                             'navn': parentObjectName,
                                             'vegreferanse': self.findVegReferanse(self.objectType, int(vegObj))
