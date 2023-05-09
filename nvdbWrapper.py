@@ -12,7 +12,6 @@ class EspecificObjectTasks:
     def constructEndPoint(self, datakatalogId, nvdbId):
         endpoint = f'https://nvdbapiles-v3.atlas.vegvesen.no/vegobjekter/{datakatalogId}/{nvdbId}' + '.json'
         self.objectType = datakatalogId
-        self.nvdbId = nvdbId
         
         response = requests.get(endpoint)
 
@@ -54,7 +53,6 @@ class EspecificObjectTasks:
                     'id': value['id'],
                     'navn': value['navn'],
                     'nvdbId': nvdbId}
-                    
     
     @classmethod
     def findEspecificChildRelation(self, raw, child=True, name='Tunnelløp'):
@@ -73,7 +71,7 @@ class EspecificObjectTasks:
                                         }
             
     @classmethod
-    def findRelation(self, source, component='Ventilasjonsanlegg', parentObjectName = 'foreldrenavn', objectType = 0):
+    def findRelation(self, source, component='Ventilasjonsanlegg', parentObjectId=0, parentObjectName = 'foreldrenavn', objectType = 0):
         data = ""
         parsed = {}
         vegObj = ""
@@ -94,10 +92,10 @@ class EspecificObjectTasks:
                         if key == 'type':
                             for k, v in value.items():
                                 if k == 'navn':
-                                    if v == component or 'Vifte/Ventilator':
+                                    if value['navn'] == 'Vifte/Ventilator' or value['navn'] == component:
                                         dictionary = {
-                                            'vegobjekt': self.nvdbId,
-                                            'relasjon': 'Vifte/Ventilator - Ventilasjon',
+                                            'vegobjekt': parentObjectId,
+                                            'relasjon': value['navn'],
                                             'objekttype': objectType,
                                             'navn': parentObjectName,
                                             'vegreferanse': self.findVegReferanse(self.objectType, int(vegObj))
