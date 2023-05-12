@@ -105,10 +105,9 @@ class EspecificObjectTasks:
     
     
     
-    
-    class AreaGeoDataParser:
-    def __init__(self):
-        pass
+class AreaGeoDataParser:
+   def __init__(self):
+       pass
         
     @classmethod    
     def counties(self):
