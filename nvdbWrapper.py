@@ -102,3 +102,59 @@ class EspecificObjectTasks:
                                         }
 
                                         return dictionary
+    
+    
+    
+    
+    class AreaGeoDataParser:
+    def __init__(self):
+        pass
+        
+    @classmethod    
+    def counties(self):
+        response = requests.get('https://nvdbapiles-v3.atlas.vegvesen.no/omrader/fylker.json')
+        data = ''
+        if response.status_code:
+            data = response.text
+            
+            parsed = json.loads(data)
+            dict = {}
+            
+            for iteration in parsed:
+                dict[iteration['navn']] = iteration['nummer']
+                
+            return dict
+            
+    @classmethod    
+    def communities(self):
+        response = requests.get('https://nvdbapiles-v3.atlas.vegvesen.no/omrader/kommuner.json')
+        data = ''
+        if response.status_code:
+            data = response.text
+            
+            parsed = json.loads(data)
+            dict = {}
+            self.communitiesInCounties = {}
+            
+            for iteration in parsed:
+                dict[iteration['navn']] = iteration['nummer']
+                self.communitiesInCounties[iteration['navn']] = iteration['fylke']
+                
+            return dict
+            
+    @classmethod
+    def fetchAllNvdbObjects(self):
+        objectTypesEndPoint = "https://nvdbapiles-v3.atlas.vegvesen.no/vegobjekttyper.json"
+        
+        response = requests.get(objectTypesEndPoint)
+        
+        data = response.text
+        
+        parsedData = json.loads(data)
+        
+        dict = {}
+        
+        for item in parsedData:
+            dict[item['navn']] = item['id']
+        
+        return dict
