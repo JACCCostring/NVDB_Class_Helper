@@ -68,3 +68,25 @@ class AreaGeoDataParser:
             listOfNames[item['navn']] = item['id']
                 
         return listOfNames
+    
+    @classmethod    
+    def especificEgenskaper(self, datakatalogId, egenskapName):
+        endpointObjectType = "https://nvdbapiles-v3.atlas.vegvesen.no/vegobjekttyper/"+str(datakatalogId)+".json"
+            
+        data = requests.get(endpointObjectType)
+            
+        raw = data.text
+            
+        parsed = json.loads(raw)
+            
+        egenskapType = parsed['egenskapstyper']
+        listOfEspecificProps = {}
+            
+        for item in egenskapType:
+            if item['navn'] == egenskapName:
+                for name, props in item.items():
+                    if name == 'tillatte_verdier':
+                        for especificProp in props:
+                           listOfEspecificProps[especificProp['verdi']] = especificProp['id']
+                    
+        return listOfEspecificProps
