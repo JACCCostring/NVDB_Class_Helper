@@ -1,3 +1,5 @@
+import requests
+
 class AreaGeoDataParser:
     def __init__(self):
         pass
