@@ -111,5 +111,3 @@ class AreaGeoDataParser:
     def setEnvironmentEndPoint(self, env):
         self.env = env
         print(self.env)
-
-#end of classess
