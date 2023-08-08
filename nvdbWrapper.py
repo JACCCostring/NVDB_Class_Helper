@@ -4,7 +4,9 @@ class AreaGeoDataParser:
         
     @classmethod    
     def counties(self):
-        response = requests.get('https://nvdbapiles-v3.atlas.vegvesen.no/omrader/fylker.json')
+#        adding some headers 
+        header = {'X-Client': 'QGIS NVDB Plugin'}
+        response = requests.get(self.env + '/omrader/fylker.json', headers = header)
         data = ''
         if response.status_code:
             data = response.text
@@ -19,7 +21,9 @@ class AreaGeoDataParser:
             
     @classmethod    
     def communities(self):
-        response = requests.get('https://nvdbapiles-v3.atlas.vegvesen.no/omrader/kommuner.json')
+#        adding some headers 
+        header = {'X-Client': 'QGIS NVDB Plugin'}
+        response = requests.get(self.env + '/omrader/kommuner.json', headers = header)
         data = ''
         if response.status_code:
             data = response.text
@@ -36,9 +40,11 @@ class AreaGeoDataParser:
             
     @classmethod
     def fetchAllNvdbObjects(self):
-        objectTypesEndPoint = "https://nvdbapiles-v3.atlas.vegvesen.no/vegobjekttyper.json"
-        
-        response = requests.get(objectTypesEndPoint)
+        objectTypesEndPoint = self.env + "/vegobjekttyper.json"
+
+#        adding some headers 
+        header = {'X-Client': 'QGIS NVDB Plugin'}        
+        response = requests.get(objectTypesEndPoint, headers = header)
         
         data = response.text
         
@@ -53,14 +59,15 @@ class AreaGeoDataParser:
         
     @classmethod    
     def egenskaper(self, datakatalogId):
-        endpointObjectType = "https://nvdbapiles-v3.atlas.vegvesen.no/vegobjekttyper/" + str(datakatalogId)
+        endpointObjectType = self.env + "/vegobjekttyper/" + str(datakatalogId)
         
-        data = requests.get(endpointObjectType)
+#        adding some headers 
+        header = {'X-Client': 'QGIS NVDB Plugin'}
+        data = requests.get(endpointObjectType, headers = header)
         
         raw = data.text
-        
         parsed = json.loads(raw)
-        
+
         egenskapType = parsed['egenskapstyper']
         listOfNames = {}
         
@@ -71,9 +78,11 @@ class AreaGeoDataParser:
         
     @classmethod
     def especificEgenskaper(self, datakatalogId, egenskapName):
-        endpointObjectType = "https://nvdbapiles-v3.atlas.vegvesen.no/vegobjekttyper/"+str(datakatalogId)
-            
-        data = requests.get(endpointObjectType)
+        endpointObjectType = self.env + "/vegobjekttyper/" + str(datakatalogId)
+
+#        adding some headers 
+        header = {'X-Client': 'QGIS NVDB Plugin'}
+        data = requests.get(endpointObjectType, headers = header)
             
         raw = data.text
             
@@ -97,4 +106,10 @@ class AreaGeoDataParser:
     @classmethod
     def egenskapDataType(self):
         return self.especificEgenskapDataType
+        
+    @classmethod
+    def setEnvironmentEndPoint(self, env):
+        self.env = env
+        print(self.env)
 
+#end of classess
