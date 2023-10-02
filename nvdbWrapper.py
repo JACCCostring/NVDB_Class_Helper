@@ -141,8 +141,8 @@ class AreaGeoDataParser:
         return 'datakatalog version not found'
 
     @classmethod
-    def getMiljoLesEndpoint(self):
-        currentMiljo = self.miljoCombo.currentText() #a combo box with Produksjon, Akseptansetest, Utvikling text
+    def getMiljoLesEndpoint(self, miljo):
+        currentMiljo = miljo #a combo box with Produksjon, Akseptansetest, Utvikling text
         lesUrl = None
         
         if 'Produksjon' in currentMiljo:
@@ -157,8 +157,8 @@ class AreaGeoDataParser:
         return lesUrl
 
     @classmethod
-    def getSistModifisert(self, type, nvdbid, versjon):
-        endpoint = self.getMiljoLesEndpoint() + '/' + 'vegobjekter' + '/' + str(type) + '/' + str(nvdbid) + '/' + str(versjon)
+    def getSistModifisert(self, type, nvdbid, versjon, currentMiljo):
+        endpoint = self.getMiljoLesEndpoint(currentMiljo) + '/' + 'vegobjekter' + '/' + str(type) + '/' + str(nvdbid) + '/' + str(versjon)
                 
         header = {
             'Content-Type': 'application/xml',
