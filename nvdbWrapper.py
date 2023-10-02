@@ -113,3 +113,64 @@ class AreaGeoDataParser:
     def setEnvironmentEndPoint(self, env):
         self.env = env
         print(self.env)
+
+    @classmethod
+    def getDatakatalogVersion(self, currentMiljo):
+        header = {'X-Client': 'QGIS NVDB Skriv'}
+        json_data = None
+        
+        if 'Produksjon' in currentMiljo:
+            url = 'https://nvdbapiles-v3.atlas.vegvesen.no'
+        
+        if 'Akseptansetest' in currentMiljo:
+            url = 'https://nvdbapiles-v3.test.atlas.vegvesen.no'
+        
+        if 'Utvikling' in currentMiljo:
+            url = 'https://nvdbapiles-v3.utv.atlas.vegvesen.no'
+            
+        endpoint = url + '/vegobjekttyper/versjon'
+        
+        response = requests.get(endpoint, headers = header)
+        
+        if response.status_code:
+            raw_data = response.text
+            json_data = json.loads(raw_data)
+                        
+            return json_data['versjon']
+        
+        return 'datakatalog version not found'
+
+    @classmethod
+    def getMiljoLesEndpoint(self):
+        currentMiljo = self.miljoCombo.currentText() #a combo box with Produksjon, Akseptansetest, Utvikling text
+        lesUrl = None
+        
+        if 'Produksjon' in currentMiljo:
+            lesUrl = 'https://nvdbapiles-v3.atlas.vegvesen.no'
+        
+        if 'Akseptansetest' in currentMiljo:
+            lesUrl = 'https://nvdbapiles-v3.test.atlas.vegvesen.no'
+        
+        if 'Utvikling' in currentMiljo:
+            lesUrl = 'https://nvdbapiles-v3.utv.atlas.vegvesen.no'
+        
+        return lesUrl
+
+    @classmethod
+    def getSistModifisert(self, type, nvdbid, versjon):
+        endpoint = self.getMiljoLesEndpoint() + '/' + 'vegobjekter' + '/' + str(type) + '/' + str(nvdbid) + '/' + str(versjon)
+                
+        header = {
+            'Content-Type': 'application/xml',
+            'X-Client': 'ny klient Skriv'
+        }
+        
+        response = requests.get(endpoint, headers = header)
+        
+        json_data = json.loads(response.text)
+        
+        for data in json_data:
+            if data == 'metadata':
+                for key, value in json_data[data].items():
+                    if key == 'sist_modifisert':
+                        return value
