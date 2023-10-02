@@ -1,4 +1,4 @@
-import requests
+import requests, json, io
 
 class AreaGeoDataParser:
     def __init__(self):
