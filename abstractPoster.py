@@ -5,7 +5,7 @@ class AbstractPoster:
         self.token = token
         self.modified_data = modified_data
 
-    def post(self):
+    def prepare_post(self):
         pass
     
     def formXMLRequest(self, egenskaper_list):
