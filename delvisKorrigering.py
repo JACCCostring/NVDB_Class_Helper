@@ -112,6 +112,7 @@ class DelvisKorrigering(AbstractPoster, QObject):
             if 'egenskaper' in item.tag:
                 
                 for egenskap_navn, value in new_modified_data.items():
+                    # print(egenskap_navn, ': ', self.modified_data[egenskap_navn])
                         
                     if 'Assosierte' not in egenskap_navn: #avoiding adding objekt relasjoner here
                                                     
@@ -126,11 +127,17 @@ class DelvisKorrigering(AbstractPoster, QObject):
 #                                those are the rest of the egenskaper
 #                                will only add egenskaper that is not Geometri and assosiasjoner
                                 if geometri_egenskap_found == False:
-
+                                    # operation will depend on if value is 'N/A' or not
+                                    # if 'N/A' then we delete egenskap and if not then update egenskap
+                                    operation = 'slett' if self.modified_data[egenskap_navn] == 'N/A' else 'oppdater'
+                                    print(operation) #debug
+                                    
                                     new_egenskap = ET.SubElement(egenskaper, 'egenskap')
-                                    new_egenskap.attrib = {'typeId': str(value), 'operasjon': 'oppdater'}
-                                    egenskap_value = ET.SubElement(new_egenskap, 'verdi')
-                                    egenskap_value.text = str(self.modified_data[egenskap_navn])
+                                    new_egenskap.attrib = {'typeId': str(value), 'operasjon': operation}
+                                    
+                                    if operation == 'oppdater':
+                                        egenskap_value = ET.SubElement(new_egenskap, 'verdi')
+                                        egenskap_value.text = str(self.modified_data[egenskap_navn])
                                 
                             if 'Geometri' in egenskap_navn: #this is a especial case, when vegobjekter has geometri
                             
@@ -170,8 +177,9 @@ class DelvisKorrigering(AbstractPoster, QObject):
         
         self.xml_string = ET.tostring(root, encoding='utf-8') #be carefull with the unicode
 
-        # print(self.xml_string) #debugin
+        print(self.xml_string) #debugin
         
+        # emiting signal
         self.endringsett_form_done.emit()
         
     def startPosting(self):
