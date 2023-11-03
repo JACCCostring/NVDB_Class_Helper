@@ -1,8 +1,8 @@
 import xml.etree.ElementTree as ET 
 
 class AbstractPoster:
-    def __init__(self, token, modified_data):
-        self.token = token
+    def __init__(self, modified_data):
+        #self.token = token
         self.modified_data = modified_data
 
     def prepare_post(self):
