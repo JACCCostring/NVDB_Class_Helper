@@ -1,5 +1,5 @@
 # nvdb-api-wrapper
-Classes Wrapper made over NVDB Les (OOP) Python Library made by Jan Kristian for Reading and Writing to NVDB.
+Classes Wrapper made after NVDB Les (OOP) Python Library for Reading and Writing to NVDB.
 
 The finality of this wrapp clasess are to make it possible from QGIS to read and write to NVDB.
 
