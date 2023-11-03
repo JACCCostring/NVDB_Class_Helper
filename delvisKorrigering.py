@@ -9,11 +9,12 @@ class DelvisKorrigering(AbstractPoster, QObject):
     endringsett_form_done = pyqtSignal()
     
     def __init__(self, token, modified_data, extra):
-        super().__init__(token, modified_data)
+        super().__init__(modified_data)
         QObject.__init__(self) #initializing QObject super class
         
         self.extra = extra #data coming from writeToNVB method and need it
         self.xml_string = None # to form xml template
+        self.token = token
         self.vegobjekter_after_send = [] #to store important info about vegobjekter endepunkter sent til nvdb
         
     def prepare_post(self):
