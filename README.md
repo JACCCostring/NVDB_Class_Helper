@@ -8,4 +8,4 @@ But for writing to NVDB i made some class wrapper calling NVDB API Les and Write
 Documentation still in development, since i'm not finished yet with some implementations and code refactoring.
 
 
-Dependencies: The construction of DelvisKorriger Class depend on PyQt, because of the use of pyqtSiganl and slots.
+<b>Dependencies</b>: The construction of DelvisKorriger Class depend on PyQt, because of the use of pyqtSiganl and slots.
