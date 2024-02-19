@@ -5,12 +5,14 @@ class AreaGeoDataParser:
         pass
         
     @classmethod    
-    def counties(self):
+    def counties(self) -> dict:
 #        adding some headers 
-        header = {'X-Client': 'QGIS NVDB Plugin'}
-        response = requests.get(self.env + '/omrader/fylker.json', headers = header)
+        dict = {}
         data = ''
-        if response.status_code:
+        header = {'X-Client': 'ny klient Les'}
+        response = requests.get(self.get_env() + '/omrader/fylker.json?srid=5973', headers = header)
+        
+        if response.ok:
             data = response.text
             
             parsed = json.loads(data)
@@ -22,16 +24,18 @@ class AreaGeoDataParser:
             return dict
             
     @classmethod    
-    def communities(self):
+    def communities(self) -> dict:
 #        adding some headers 
-        header = {'X-Client': 'QGIS NVDB Plugin'}
-        response = requests.get(self.env + '/omrader/kommuner.json', headers = header)
+        dict = {}
         data = ''
-        if response.status_code:
+        header = {'X-Client': 'ny klient Les'}
+        response = requests.get(self.get_env() + '/omrader/kommuner.json?srid=5973', headers = header)
+        
+        if response.ok:
             data = response.text
             
             parsed = json.loads(data)
-            dict = {}
+            
             self.communitiesInCounties = {}
             
             for iteration in parsed:
@@ -41,67 +45,69 @@ class AreaGeoDataParser:
             return dict
             
     @classmethod
-    def fetchAllNvdbObjects(self):
-        objectTypesEndPoint = self.env + "/vegobjekttyper.json"
+    def fetchAllNvdbObjects(self) -> dict:
+        dict = {}
+        objectTypesEndPoint = self.get_env() + "/vegobjekttyper.json"
 
 #        adding some headers 
-        header = {'X-Client': 'QGIS NVDB Plugin'}        
+        header = {'X-Client': 'ny klient Les'}        
         response = requests.get(objectTypesEndPoint, headers = header)
         
-        data = response.text
-        
-        parsedData = json.loads(data)
-        
-        dict = {}
-        
-        for item in parsedData:
-            dict[item['navn']] = item['id']
+        if response.ok:
+            data = response.text
+            
+            parsedData = json.loads(data)
+
+            for item in parsedData:
+                dict[item['navn']] = item['id']
         
         return dict
         
     @classmethod    
-    def egenskaper(self, datakatalogId):
-        endpointObjectType = self.env + "/vegobjekttyper/" + str(datakatalogId)
+    def egenskaper(self, datakatalogId: int) -> dict:
+        listOfNames = {}
+        endpointObjectType = self.get_env() + "/vegobjekttyper/" + str(datakatalogId)
         
 #        adding some headers 
-        header = {'X-Client': 'QGIS NVDB Plugin'}
+        header = {'X-Client': 'ny klient Les'}
         data = requests.get(endpointObjectType, headers = header)
         
-        raw = data.text
-        parsed = json.loads(raw)
+        if data.ok:
+            raw = data.text
+            parsed = json.loads(raw)
 
-        egenskapType = parsed['egenskapstyper']
-        listOfNames = {}
-        
-        for item in egenskapType:
-            listOfNames[item['navn']] = item['id']
+            egenskapType = parsed['egenskapstyper']
+            
+            for item in egenskapType:
+                listOfNames[item['navn']] = item['id']
                 
         return listOfNames
         
     @classmethod
-    def especificEgenskaper(self, datakatalogId, egenskapName):
-        endpointObjectType = self.env + "/vegobjekttyper/" + str(datakatalogId)
+    def especificEgenskaper(self, datakatalogId, egenskapName) -> dict:
+        listOfEspecificProps = {}
+        endpointObjectType = self.get_env() + "/vegobjekttyper/" + str(datakatalogId)
 
 #        adding some headers 
-        header = {'X-Client': 'QGIS NVDB Plugin'}
+        header = {'X-Client': 'ny klient Les'}
         data = requests.get(endpointObjectType, headers = header)
-            
-        raw = data.text
-            
-        parsed = json.loads(raw)
-            
-        egenskapType = parsed['egenskapstyper']
-        listOfEspecificProps = {}
-            
-        for item in egenskapType:
-            if item['navn'] == egenskapName:
-                for name, props in item.items():
-                    if name == 'datatype':
-                        self.especificEgenskapDataType = props
-                        
-                    if name == 'tillatte_verdier':
-                        for especificProp in props:
-                           listOfEspecificProps[especificProp['verdi']] = especificProp['id']
+        
+        if data.ok:
+            raw = data.text
+                
+            parsed = json.loads(raw)
+                
+            egenskapType = parsed['egenskapstyper']
+                
+            for item in egenskapType:
+                if item['navn'] == egenskapName:
+                    for name, props in item.items():
+                        if name == 'datatype':
+                            self.especificEgenskapDataType = props
+                            
+                        if name == 'tillatte_verdier':
+                            for especificProp in props:
+                               listOfEspecificProps[especificProp['verdi']] = especificProp['id']
                     
         return listOfEspecificProps
     
@@ -110,13 +116,12 @@ class AreaGeoDataParser:
         return self.especificEgenskapDataType
         
     @classmethod
-    def setEnvironmentEndPoint(self, env):
+    def set_env(self, env: str) -> None:
         self.env = env
-        print(self.env)
 
     @classmethod
     def getDatakatalogVersion(self, currentMiljo):
-        header = {'X-Client': 'QGIS NVDB Skriv'}
+        header = {'X-Client': 'ny klient Les'}
         json_data = None
         
         if 'Produksjon' in currentMiljo:
@@ -132,7 +137,7 @@ class AreaGeoDataParser:
         
         response = requests.get(endpoint, headers = header)
         
-        if response.status_code:
+        if response.ok:
             raw_data = response.text
             json_data = json.loads(raw_data)
                         
@@ -141,17 +146,17 @@ class AreaGeoDataParser:
         return 'datakatalog version not found'
 
     @classmethod
-    def getMiljoLesEndpoint(self, miljo):
-        currentMiljo = miljo #a combo box with Produksjon, Akseptansetest, Utvikling text
+    def get_env(self) -> str:
+        currentMiljo = self.env #this variable value must be already set, before use with, object.set_env() method
         lesUrl = None
         
-        if 'Produksjon' in currentMiljo:
+        if 'prod' in currentMiljo:
             lesUrl = 'https://nvdbapiles-v3.atlas.vegvesen.no'
         
-        if 'Akseptansetest' in currentMiljo:
+        if 'test' in currentMiljo:
             lesUrl = 'https://nvdbapiles-v3.test.atlas.vegvesen.no'
         
-        if 'Utvikling' in currentMiljo:
+        if 'utv' in currentMiljo:
             lesUrl = 'https://nvdbapiles-v3.utv.atlas.vegvesen.no'
         
         return lesUrl
@@ -162,7 +167,7 @@ class AreaGeoDataParser:
                 
         header = {
             'Content-Type': 'application/xml',
-            'X-Client': 'ny klient Skriv'
+            'X-Client': 'ny klient Les'
         }
         
         response = requests.get(endpoint, headers = header)
